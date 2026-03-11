@@ -1,0 +1,145 @@
+GEM INVENTORY MANAGEMENT SYSTEM (Web Application Functional
+Specification)
+
+1.  SYSTEM OVERVIEW This system manages:
+
+-   Purchase
+-   Manufacturing
+-   Sales
+-   Rejections
+-   Inventory
+-   Product Lifecycle
+-   Costing & Profit
+-   Labels
+
+Stock is auto calculated. Lot numbers and pricing are manual entry.
+
+------------------------------------------------------------------------
+
+2.  PURCHASE MODULE
+
+Fields: - Lot No (Manual) - Date - Item Name - Category (Ready Goods /
+Rough / By Order) - Supplier Name - Description Reference - Gross
+Weight - Less Weight - Net Weight (Auto) - Size - Shape - No. of Lines -
+Length of Line - No. of Pieces - Purchase Price - Cost per Gram (Auto) -
+Total Cost (Auto)
+
+Purchase Rejection Logic: - If rejection date entered → stock auto
+removed. - If rejection date blank → shows in Purchase Rejection
+Pending.
+
+------------------------------------------------------------------------
+
+3.  MANUFACTURING MODULE
+
+Fields: - Lot No - Sub Lot No - Parent Sub Lot (if split) - Date -
+Issued To - Weight - No. of Pieces - Shape - Size - No. of Lines -
+Length - Labour Cost - Other Cost - Total Manufacturing Cost (Auto)
+
+MANUFACTURING SELECTION: Creates new Sub Lot under Ready Goods. Stock
+Movement: Manufacturing → Ready Goods Status: Ready
+
+MANUFACTURING REJECTION: Fields: - Weight - Pieces - Return to
+Manufacturer? (Yes/No) - Date of Return
+
+Logic: If Return = YES and Date entered → Status: Returned to
+Manufacturer If Return = NO → Status: Manufacturing Rejection Pending
+
+------------------------------------------------------------------------
+
+4.  SALES MODULE
+
+Fields: - Lot No - Sub Lot No - Date - Sold To - Sale Price - Discount -
+Net Sale - Tax - Final Bill Amount - Bill No
+
+Stock Movement: Ready Goods → Sales
+
+SALES REJECTION (Customer Return): - Returned Weight - Pieces - Return
+Date
+
+Returned stock goes back to Ready Goods. Status: Returned – Resellable
+
+------------------------------------------------------------------------
+
+5.  STOCK MOVEMENT LEDGER
+
+Every transaction records: Date | Lot | Sub Lot | From | To | Weight |
+Pieces | Reference Type
+
+Example movements: - Purchase → Stock - Stock → Manufacturing -
+Manufacturing → Ready Goods - Ready Goods → Sales - Sales → Ready Goods
+(Return) - Manufacturing → Manufacturer (Return)
+
+------------------------------------------------------------------------
+
+6.  INVENTORY DASHBOARD
+
+Live Stock Summary: Category | Total Weight | Pieces | Total Value
+
+Categories: - Rough - Ready Goods - By Order - Manufacturing - Rejection
+Pending - Returned to Manufacturer - Sold
+
+Rejection Section shows: Lot | Sub Lot | Type | Weight | Status
+
+Types: - Purchase Rejection - Manufacturing Rejection - Sales Return
+
+Statuses: - Pending - Returned - Resellable - Closed
+
+------------------------------------------------------------------------
+
+7.  SUB LOT SPLITTING LOGIC
+
+Example: Lot 101 → Sub A (10kg) Sub A → A1 (6kg sold) Sub A → A2 (4kg
+remaining)
+
+Each sub lot must store: - Parent Sub Lot ID - Original Lot Reference
+
+------------------------------------------------------------------------
+
+8.  COSTING & PROFIT SYSTEM
+
+Total Product Cost = Purchase Cost + Manufacturing Cost
+
+Profit Formula: Profit = Net Sale – Total Product Cost
+
+Manual cost entry allowed. Profit auto calculated.
+
+------------------------------------------------------------------------
+
+9.  PRODUCT HISTORY (PRODUCT SUM UP)
+
+Search by: - Lot No - Sub Lot No
+
+Must display: - Purchase details - Manufacturing details - Splits -
+Sales - Returns - Rejections - Current Status - Current Balance - Total
+Profit
+
+------------------------------------------------------------------------
+
+10. STATUS ENGINE (AUTO)
+
+Purchased → In Stock Sent to Manufacturing → In Process Selected → Ready
+Partially Sold → Partially Sold Fully Sold → Closed Returned → Returned
+Rejection Pending → Pending Return Returned to Manufacturer → Closed –
+Returned
+
+------------------------------------------------------------------------
+
+11. LABEL SYSTEM
+
+Stock Label: - Shop Name - Item Name - Lot No - Sub Lot No - Shape -
+Size - Pieces - Lines - Length - Weight - QR Code (Recommended)
+
+Received Label: Same fields + Selection/Rejection mark
+
+------------------------------------------------------------------------
+
+SYSTEM RULES:
+
+1.  All weight stored internally in grams.
+2.  No stock movement without ledger entry.
+3.  No deletion after sale (only reverse entry).
+4.  Every edit logged (Audit Trail).
+5.  Manual lot entry allowed.
+6.  Sub lot split unlimited.
+7.  Stock auto calculated at all times.

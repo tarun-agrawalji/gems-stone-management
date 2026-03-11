@@ -1,0 +1,18 @@
+{
+  "results": [
+    "\\app\\(app)\\purchase\\[id]",
+    "\\app\\(app)\\rejection\\[type]",
+    "\\app\\(app)\\rejection\\[type]\\[id]",
+    "\\app\\api\\auth\\[...nextauth]",
+    "\\app\\api\\lots\\[id]",
+    "\\app\\api\\manufacturing\\[id]",
+    "\\app\\api\\products\\[id]",
+    "\\app\\api\\purchase\\[id]",
+    "\\app\\api\\rejection\\[id]",
+    "\\app\\api\\rejection\\[type]",
+    "\\app\\api\\rejection\\[type]\\[id]",
+    "\\app\\api\\sales\\[id]",
+    "\\app\\api\\stock-ledger\\[id]"
+  ],
+  "errors": []
+}

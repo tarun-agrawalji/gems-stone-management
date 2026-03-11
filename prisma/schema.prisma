@@ -1,0 +1,230 @@
+// This is a Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  users         User[]
+  products      Product[]
+  lots          Lot[]
+  purchases     Purchase[]
+  manufacturing Manufacturing[]
+  rejections    Rejection[]
+  sales         Sales[]
+  stockLedgers  StockLedger[]
+}
+
+model User {
+  id             String       @id @default(cuid())
+  name           String
+  email          String       @unique
+  password       String
+  role           String       @default("STAFF") // ADMIN, STAFF, etc.
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model Product {
+  id             String       @id @default(cuid())
+  name           String
+  category       String
+  description    String?
+  unit           String?      @default("G") // G, KG, CT
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+
+  lots         Lot[]
+  stockLedgers StockLedger[]
+}
+
+model Lot {
+  id             String       @id @default(cuid())
+  lotNumber      String       @unique
+  productId      String
+  product        Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  // Basic Info
+  itemName       String?
+  supplierName   String?
+  category       String?
+  descriptionRef String?
+
+  // Weights & Quantities
+  grossWeight    Float?
+  lessWeight     Float?     @default(0)
+  netWeight      Float?     // Computed or explicitly stored
+  weightUnit     String     @default("G")
+  
+  size           String?
+  shape          String?
+  pieces         Int?
+  lines          Int?
+  lineLength     Float?
+  quantity       Int          @default(0)
+
+  status         String     @default("IN_STOCK") // IN_STOCK, IN_PROCESS, READY, PARTIALLY_SOLD, SOLD, RETURNED
+  
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+
+  purchases     Purchase[]
+  manufacturing Manufacturing[]
+  rejections    Rejection[]
+  sales         Sales[]
+}
+
+model Purchase {
+  id             String       @id @default(cuid())
+  lotId          String
+  lot            Lot          @relation(fields: [lotId], references: [id], onDelete: Cascade)
+  
+  date           DateTime     @default(now())
+  supplier       String
+  itemName       String?
+  descriptionRef String?
+
+  // Details
+  grossWeight    Float
+  lessWeight     Float        @default(0)
+  netWeight      Float
+  weightUnit     String       @default("G")
+  
+  size           String?
+  shape          String?
+  pieces         Int?
+  lines          Int?
+  lineLength     Float?
+
+  // Costs
+  purchasePrice  Float
+  totalCost      Float?
+  costPerGram    Float?
+
+  // Rejection info (Optional, often handled in separate Rejection records)
+  rejectionWeight Float?
+  rejectionPieces Int?
+  rejectionLines  Int?
+  rejectionLength Float?
+  rejectionDate   DateTime?
+  rejectionStatus String?     @default("PENDING")
+
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model Manufacturing {
+  id             String       @id @default(cuid())
+  lotId          String
+  lot            Lot          @relation(fields: [lotId], references: [id], onDelete: Cascade)
+  
+  date           DateTime     @default(now())
+  issuedTo       String?
+  processType    String?      // e.g., POLISHING, CUTTING
+  
+  // Details
+  weight         Float
+  weightUnit     String       @default("G")
+  pieces         Int?
+  shape          String?
+  size           String?
+  lines          Int?
+  length         Float?
+
+  // Costs
+  labourCost     Float        @default(0)
+  otherCost      Float        @default(0)
+  totalManufacturingCost Float @default(0)
+
+  status         String?      @default("COMPLETED")
+  outputQuantity Int?         @default(0) // For backward compatibility with simpler schema
+
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model Rejection {
+  id                 String       @id @default(cuid())
+  lotId              String
+  lot                Lot          @relation(fields: [lotId], references: [id], onDelete: Cascade)
+  
+  reason             String
+  quantity           Int?         @default(0)
+  weight             Float?
+  pieces             Int?
+  lines              Int?
+  length             Float?
+  
+  sentToManufacturer Boolean      @default(false)
+  status             String       @default("PENDING") // PENDING, RETURNED, CLOSED
+  date               DateTime     @default(now())
+  organizationId     String
+  organization       Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model Sales {
+  id             String       @id @default(cuid())
+  lotId          String
+  lot            Lot          @relation(fields: [lotId], references: [id], onDelete: Cascade)
+  
+  date           DateTime     @default(now())
+  customer       String
+  billNo         String?
+  itemName       String?
+  descriptionRef String?
+
+  // Sold Details
+  weight         Float
+  weightUnit     String       @default("G")
+  pieces         Int?
+  shape          String?
+  size           String?
+  lines          Int?
+  length         Float?
+
+  // Financials
+  salePrice      Float
+  discount       Float        @default(0)
+  tax            Float        @default(0)
+  netSale        Float
+  finalBillAmount Float
+
+  // Return fields
+  isReturn       Boolean      @default(false)
+  returnedWeight Float?
+  returnedPieces Int?
+  returnedLines  Int?
+  returnedLength Float?
+  returnDate     DateTime?
+  status         String       @default("PENDING") // For returns: PENDING, RETURNED, CLOSED
+
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model StockLedger {
+  id              String       @id @default(cuid())
+  productId       String
+  product         Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  transactionType String // "PURCHASE", "SALE", "MANUFACTURING_ISSUE", "MANUFACTURING_RECEIPT", "REJECTION"
+  quantity        Int?         // Legacy count
+  weight          Float?       // Track weight directly
+  referenceId     String // ID to the transaction row (Purchase/Sale/etc)
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdAt       DateTime     @default(now())
+}

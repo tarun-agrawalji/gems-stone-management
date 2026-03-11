@@ -1,0 +1,191 @@
+purchase
+1.lot no
+2.name of item
+3.Date
+4.recieved from
+5.Description reference
+6.catagorie
+ready goods
+rough
+on order
+
+a.Ready goods
+recieved
+1.weight-kg, gm, ct
+ gross weight
+ less weight
+ net weight
+2.size
+3.shape
+4.no of line
+5.length of line
+6.no of peices
+selection
+7.weight - same
+8.no of peices
+9.no of line
+10. length of line
+rejection
+11.weight- same 
+12.no of peices
+13.no of line
+14.lenght of line
+15.date of  return
+
+b.Rough
+recieved
+1.weight-kg, gm, ct
+ gross weight
+ less weight
+ net weight
+2.no of peices
+3.no of line
+4.lenght of  line
+selection
+5.weight - same
+6.no of peices
+7.no of line 
+8.length of line
+rejection
+9.weight- same 
+10.no of peices
+11.no of line
+12.length of line
+13.Date of return
+14.price for all
+
+c.By Order
+recieved
+1.weight-kg, gm, ct
+ gross weight
+ less weight
+ net weight
+2.size
+3.shape
+4.no of line
+5.length of line
+6.no of peices
+selection
+7.weight - same
+8.no of peices
+9.no of line
+10. length of line
+rejection
+11.weight- same 
+12.no of peices
+13 no of line
+14.lenght of line
+15.Date of return
+
+
+Manufacturing
+1.Lot no
+2.sub lot
+3.Date
+4.Name of item
+5.Description refrence
+6.Issued to/recieved from
+7.weight- same
+8.no of peices
+9.shape 
+10.size
+11.no of line
+12.length of line
+selection
+13.weight
+14.no of peices
+15.shape
+16.size
+17.no  of line
+18.length of line
+rejection
+19.weight
+20.no of peices
+21.no of line
+22.lenght of line
+23.date of return 
+
+
+By order
+1.Lot no
+2.Date
+3.Name of item
+4.Description refrence
+5.recieved from
+6.weight- same
+7.no of peices
+8.shape 
+9.size
+10.no of line
+11.length of line
+selection
+12.weight
+13.no of peices
+14.shape
+15.size
+16.no  of line
+17.length of line
+rejection
+18.weight
+19.no of peices
+20.no of line
+21.lenght of line
+22.date of return 
+23.price
+
+Sales
+1.Lot no
+2.Sub lot no
+3.Date of sale
+4.Name of item
+5.Description refrence
+6.Sold to
+7.Sale price
+8.Weight- same
+9.Size
+10.No of peices
+11.No of line
+12.Length of line
+rejection
+13.weight-same
+14.no of peices
+15.no of line 
+16.length of line
+17.date of return
+18.net sale
+19. amount of net sale
+20.taxes
+21.bill no and date
+
+Inventory
+Ready goods
+Rejection
+Manufacturing
+Sales
+
+product sum up
+history of product by lot no and sub lot nos
+
+Print label
+Sales/Stock label
+1.shop name
+2.name of item
+3.lot no
+4.shape
+5.size
+6.no of peices
+7.no of lines
+8.lenght of line
+9.weight
+
+Received
+1.shop name
+2.name of item
+3.lot no
+4.shape
+5.size
+6.no of peices
+7.no of lines
+8.lenght of line
+9.weight
+10.selection/rejection

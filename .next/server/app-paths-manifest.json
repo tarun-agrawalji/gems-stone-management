@@ -1,0 +1,8 @@
+{
+  "/api/rejection-item/[type]/[id]/route": "app/api/rejection-item/[type]/[id]/route.js",
+  "/(app)/dashboard/page": "app/(app)/dashboard/page.js",
+  "/(app)/rejection/[type]/[id]/page": "app/(app)/rejection/[type]/[id]/page.js",
+  "/(app)/rejection/page": "app/(app)/rejection/page.js",
+  "/(app)/purchase/page": "app/(app)/purchase/page.js",
+  "/(app)/purchase/[id]/page": "app/(app)/purchase/[id]/page.js"
+}

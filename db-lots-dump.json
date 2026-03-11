@@ -1,0 +1,84 @@
+{
+  "lots": [
+    {
+      "id": "cmmfrxiqj0000w5eo127zkf5v",
+      "lotNo": "2",
+      "itemName": "fsafkalj",
+      "category": "ROUGH",
+      "supplierName": "dsajf;l",
+      "description": "dfs;jfo",
+      "createdAt": "2026-03-07T03:38:47.707Z",
+      "updatedAt": "2026-03-07T03:38:47.707Z"
+    },
+    {
+      "id": "cmmh87bff0000w54g0uq8p9ld",
+      "lotNo": "3",
+      "itemName": "sfdsa",
+      "category": "ROUGH",
+      "supplierName": "fghj",
+      "description": "xcvbnmkjuhygv",
+      "createdAt": "2026-03-08T04:02:04.825Z",
+      "updatedAt": "2026-03-08T04:02:04.825Z"
+    },
+    {
+      "id": "cmmhsxzg0000000344atud052",
+      "lotNo": "1001",
+      "itemName": "",
+      "category": "ROUGH",
+      "supplierName": "abhinav",
+      "description": "refinded data",
+      "createdAt": "2026-03-08T13:42:41.328Z",
+      "updatedAt": "2026-03-08T13:42:41.328Z"
+    }
+  ],
+  "subLots": [
+    {
+      "id": "cmmfrxis60002w5eogzcuyhra",
+      "subLotNo": "2-A",
+      "lotId": "cmmfrxiqj0000w5eo127zkf5v",
+      "parentSubLotId": null,
+      "status": "IN_STOCK",
+      "weight": 800,
+      "weightUnit": "G",
+      "pieces": null,
+      "shape": "",
+      "size": "10mm",
+      "lines": null,
+      "length": null,
+      "createdAt": "2026-03-07T03:38:47.766Z",
+      "updatedAt": "2026-03-07T03:38:47.766Z"
+    },
+    {
+      "id": "cmmh87bga0002w54ghyxiunyd",
+      "subLotNo": "3-A",
+      "lotId": "cmmh87bff0000w54g0uq8p9ld",
+      "parentSubLotId": null,
+      "status": "IN_STOCK",
+      "weight": 4,
+      "weightUnit": "CT",
+      "pieces": 123,
+      "shape": "dfghj",
+      "size": "",
+      "lines": null,
+      "length": null,
+      "createdAt": "2026-03-08T04:02:04.858Z",
+      "updatedAt": "2026-03-08T04:02:04.858Z"
+    },
+    {
+      "id": "cmmhsxzgo00020034050nzt6u",
+      "subLotNo": "1001-A",
+      "lotId": "cmmhsxzg0000000344atud052",
+      "parentSubLotId": null,
+      "status": "IN_STOCK",
+      "weight": 102,
+      "weightUnit": "G",
+      "pieces": 98,
+      "shape": "",
+      "size": "",
+      "lines": 12,
+      "length": 12.99,
+      "createdAt": "2026-03-08T13:42:41.353Z",
+      "updatedAt": "2026-03-08T13:42:41.353Z"
+    }
+  ]
+}

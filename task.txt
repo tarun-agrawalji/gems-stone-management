@@ -1,0 +1,12 @@
+1. connect the backend ask antigravity for this that how to connect backend
+2. then check for all the fields by filling all the entries
+and check its logics like when the product is go for 
+manufacturing or sales stocks got deducted from the finished
+goods or not  
+3.go on aura.build for finding a free template for 
+our saas website then their tell it about our project 
+then download the html file and tell thee antigravity to make 
+same website from this html code and after that connect it 
+with our webapplication
+4.and check for every logic 
+5.add a field in purchase manufacturing sales everywhere for payment is done or pendinng and all its logics
