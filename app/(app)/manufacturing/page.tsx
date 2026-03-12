@@ -309,14 +309,14 @@ export default function ManufacturingPage() {
 
   /* ─── Render ─────────────────────────────────────────────────── */
   return (
-    <div className="container-fluid p-0">
+    <div className="container-fluid p-0" suppressHydrationWarning>
       {/* Header */}
-      <div className="row mb-2 mb-xl-3">
-        <div className="col-auto d-none d-sm-block">
+      <div className="row mb-2 mb-xl-3" suppressHydrationWarning>
+        <div className="col-auto d-none d-sm-block" suppressHydrationWarning>
           <h1 className="h3 d-inline align-middle text-white">Manufacturing</h1>
           <p className="text-white text-opacity-75 text-sm mt-1">{total} total records</p>
         </div>
-        <div className="col-auto ms-auto text-end mt-n1">
+        <div className="col-auto ms-auto text-end mt-n1" suppressHydrationWarning>
           <button onClick={() => setShowForm(true)} className="btn btn-primary shadow-sm">
             <Plus className="w-4 h-4 me-1 align-middle d-inline-block" /> New Entry
           </button>
@@ -324,9 +324,9 @@ export default function ManufacturingPage() {
       </div>
 
       {/* Search */}
-      <div className="card mb-3">
-        <div className="card-body p-3">
-          <div className="input-group" style={{ maxWidth: '300px' }}>
+      <div className="card mb-3" suppressHydrationWarning>
+        <div className="card-body p-3" suppressHydrationWarning>
+          <div className="input-group" style={{ maxWidth: '300px' }} suppressHydrationWarning>
             <span className="input-group-text"><Search className="w-4 h-4" /></span>
             <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search lot, sub-lot, issued to..." className="form-control" />
           </div>
@@ -334,8 +334,8 @@ export default function ManufacturingPage() {
       </div>
 
       {/* Table */}
-      <div className="card flex-fill w-100">
-        <div className="table-responsive">
+      <div className="card flex-fill w-100" suppressHydrationWarning>
+        <div className="table-responsive" suppressHydrationWarning>
           <table className="table table-hover my-0">
             <thead>
               <tr>
@@ -360,7 +360,7 @@ export default function ManufacturingPage() {
                   <td>{formatINR(m.labourCost)}</td>
                   <td>{formatINR(m.otherCost)}</td>
                   <td className="fw-semibold text-warning">{formatINR(m.totalManufacturingCost)}</td>
-                  <td><span className="badge" style={{ backgroundColor: getStatusColor(m.lot?.status || "PENDING") }}>{getStatusLabel(m.lot?.status || "PENDING")}</span></td>
+                  <td><span className={`badge border ${getStatusColor(m.lot?.status || "PENDING")}`}>{getStatusLabel(m.lot?.status || "PENDING")}</span></td>
                 </tr>
               ))}
             </tbody>

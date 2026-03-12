@@ -47,6 +47,22 @@ export default function PurchaseDetailPage({ params }: { params: Promise<Params>
         if (!r.ok) throw new Error("Failed to fetch purchase");
         const data = await r.json();
         
+        // Compute net weight (gross - less)
+        const netWt = (data.grossWeight || 0) - (data.lessWeight || 0);
+        const rejWt = data.rejectionWeight || 0;
+        const rejPc = data.rejectionPieces || 0;
+        const rejLn = data.rejectionLines || 0;
+        const rejLen = data.rejectionLength || 0;
+        const totalPc = data.pieces || 0;
+        const totalLn = data.lines || 0;
+        const totalLen = data.lineLength || 0;
+
+        // Selection = Total - Rejection (since these fields are not stored in DB)
+        const selWt = Math.max(0, netWt - rejWt);
+        const selPc = Math.max(0, totalPc - rejPc);
+        const selLn = Math.max(0, totalLn - rejLn);
+        const selLen = Math.max(0, totalLen - rejLen);
+
         setForm({
           lotNo: data.lot?.lotNumber || "",
           date: data.date ? new Date(data.date).toISOString().split('T')[0] : "",
@@ -62,10 +78,10 @@ export default function PurchaseDetailPage({ params }: { params: Promise<Params>
           pieces: data.pieces?.toString() || "",
           lines: data.lines?.toString() || "",
           lineLength: data.lineLength?.toString() || "",
-          selectionWeight: data.selectionWeight?.toString() || "",
-          selectionPieces: data.selectionPieces?.toString() || "",
-          selectionLines: data.selectionLines?.toString() || "",
-          selectionLength: data.selectionLength?.toString() || "",
+          selectionWeight: selWt > 0 ? selWt.toFixed(3) : "",
+          selectionPieces: selPc > 0 ? selPc.toString() : "",
+          selectionLines: selLn > 0 ? selLn.toString() : "",
+          selectionLength: selLen > 0 ? selLen.toFixed(2) : "",
           rejectionWeight: data.rejectionWeight?.toString() || "",
           rejectionPieces: data.rejectionPieces?.toString() || "",
           rejectionLines: data.rejectionLines?.toString() || "",
@@ -136,18 +152,27 @@ export default function PurchaseDetailPage({ params }: { params: Promise<Params>
           grossWeight: parseFloat(form.grossWeight),
           lessWeight: parseFloat(form.lessWeight || "0"),
           lines: form.lines ? parseInt(form.lines) : undefined,
+          lineLength: form.lineLength ? parseFloat(form.lineLength) : undefined,
           pieces: form.pieces ? parseInt(form.pieces) : undefined,
           purchasePrice: parseFloat(form.purchasePrice),
           selectionWeight: form.selectionWeight ? parseFloat(form.selectionWeight) : undefined,
           selectionPieces: form.selectionPieces ? parseInt(form.selectionPieces) : undefined,
           selectionLines: form.selectionLines ? parseInt(form.selectionLines) : undefined,
+          selectionLength: form.selectionLength ? parseFloat(form.selectionLength) : undefined,
           rejectionWeight: form.rejectionWeight ? parseFloat(form.rejectionWeight) : undefined,
           rejectionPieces: form.rejectionPieces ? parseInt(form.rejectionPieces) : undefined,
           rejectionLines: form.rejectionLines ? parseInt(form.rejectionLines) : undefined,
+          rejectionLength: form.rejectionLength ? parseFloat(form.rejectionLength) : undefined,
+          rejectionDate: form.rejectionDate || null,
+          rejectionStatus: form.rejectionStatus || "PENDING",
+          supplierName: form.supplierName,
         }),
       });
       
-      if (!r.ok) throw new Error("Failed to update purchase");
+      if (!r.ok) {
+        const errBody = await r.json().catch(() => ({}));
+        throw new Error(errBody.error || "Failed to update purchase");
+      }
       
       setSuccess("Purchase updated successfully!");
       setIsEditMode(false);

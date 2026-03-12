@@ -21,6 +21,17 @@ export async function createSale(
   data: any,
   organizationId: string
 ) {
+  if (!organizationId) {
+    throw new Error("Organization ID is required to create a sale");
+  }
+
+  // Auto-heal: ensure organization exists
+  await (prisma as any).organization.upsert({
+    where: { id: organizationId },
+    update: {},
+    create: { id: organizationId, name: "Default Organization" },
+  });
+
   return prisma.$transaction(async (tx) => {
     // 1. Create Sale Record
     const sale = await (tx as any).sales.create({

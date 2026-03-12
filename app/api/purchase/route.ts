@@ -20,6 +20,9 @@ export async function POST(req: Request) {
     const purchase = await purchaseService.createPurchase(body, organizationId);
     return NextResponse.json(purchase, { status: 201 });
   } catch (error: any) {
+    if (error.code === 'P2002') {
+      return NextResponse.json({ error: "A lot with this Lot Number already exists. Please use a different Lot Number." }, { status: 400 });
+    }
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

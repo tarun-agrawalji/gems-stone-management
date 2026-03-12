@@ -20,6 +20,17 @@ export async function createManufacturing(
   data: any,
   organizationId: string
 ) {
+  if (!organizationId) {
+    throw new Error("Organization ID is required to create a manufacturing record");
+  }
+
+  // Auto-heal: ensure organization exists
+  await (prisma as any).organization.upsert({
+    where: { id: organizationId },
+    update: {},
+    create: { id: organizationId, name: "Default Organization" },
+  });
+
   return prisma.$transaction(async (tx) => {
     // 1. Create Manufacturing Record
     const mfg = await (tx as any).manufacturing.create({

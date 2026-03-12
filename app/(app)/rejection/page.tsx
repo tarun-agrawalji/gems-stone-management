@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { AlertTriangle, Search, Loader2, CheckCircle, Clock, RotateCcw, XCircle } from "lucide-react";
 import { formatDate } from "@/lib/utils";
+import Link from "next/link";
 
 type Tab = "purchase" | "manufacturing" | "sales";
 
@@ -34,12 +35,25 @@ export default function RejectionPage() {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const params = new URLSearchParams({ type: activeTab, search });
-    const r = await fetch(`/api/rejection?${params}`);
-    const json = await r.json();
-    setData(json);
-    setLoading(false);
-  }, [activeTab, search]);
+    try {
+      const params = new URLSearchParams({ search });
+      const r = await fetch(`/api/rejection?${params}`);
+      if (!r.ok) {
+        const err = await r.json().catch(() => ({}));
+        console.error("[Rejection] API error:", err);
+        setData(null);
+      } else {
+        const json = await r.json();
+        setData(json);
+      }
+    } catch (err) {
+      console.error("[Rejection] Fetch error:", err);
+      setData(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [search]);
+
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -170,22 +184,25 @@ function PurchaseTable({ rows }: { rows: any[] }) {
     <table className="table table-hover my-0">
       <thead>
         <tr>
-          <th>Lot No</th><th>Date</th><th>Supplier</th><th>Item</th><th>Status</th>
+          <th>Lot No</th><th>Date</th><th>Supplier</th><th>Item</th>
+          <th>Rej. Weight</th><th>Rej. Pieces</th><th>Status</th>
         </tr>
       </thead>
       <tbody>
         {rows.length === 0 ? (
-          <tr><td colSpan={5} className="text-center py-5 text-muted">No purchase rejections found.</td></tr>
+          <tr><td colSpan={7} className="text-center py-5 text-muted">No purchase rejections found.</td></tr>
         ) : rows.map((p: any) => (
           <tr key={p.id}>
             <td>
-              <a href={`/rejection/purchase/${p.id}`} className="font-monospace text-primary fw-bold hover:underline">
-                {p.lot?.lotNo}
-              </a>
+              <Link href={`/rejection/purchase/${p.id}`} className="font-monospace text-primary fw-bold hover:underline">
+                {p.lot?.lotNumber || p.lot?.lotNo || "—"}
+              </Link>
             </td>
             <td>{formatDate(p.date)}</td>
             <td>{p.supplierName || "—"}</td>
             <td>{p.itemName || "—"}</td>
+            <td>{p.rejectionWeight != null ? `${p.rejectionWeight} ${p.weightUnit || "G"}` : "—"}</td>
+            <td>{p.rejectionPieces ?? "—"}</td>
             <td><StatusBadge status={p.rejectionStatus || "PENDING"} /></td>
           </tr>
         ))}
@@ -193,6 +210,7 @@ function PurchaseTable({ rows }: { rows: any[] }) {
     </table>
   );
 }
+
 
 function ManufacturingTable({ rows }: { rows: any[] }) {
   return (
@@ -208,9 +226,9 @@ function ManufacturingTable({ rows }: { rows: any[] }) {
         ) : rows.map((m: any) => (
           <tr key={m.id}>
             <td>
-              <a href={`/rejection/manufacturing/${m.id}`} className="font-monospace text-primary fw-bold hover:underline">
-                {m.lot?.lotNo}
-              </a>
+              <Link href={`/rejection/manufacturing/${m.id}`} className="font-monospace text-primary fw-bold hover:underline">
+                {m.lot?.lotNo || m.lot?.lotNumber || "—"}
+              </Link>
             </td>
             <td>{formatDate(m.date)}</td>
             <td>{m.reason || "Manufacturing Reject"}</td>
@@ -236,9 +254,9 @@ function SalesReturnTable({ rows }: { rows: any[] }) {
         ) : rows.map((s: any) => (
           <tr key={s.id}>
             <td>
-              <a href={`/rejection/sales/${s.id}`} className="font-monospace text-primary fw-bold hover:underline">
-                {s.lot?.lotNo}
-              </a>
+              <Link href={`/rejection/sales/${s.id}`} className="font-monospace text-primary fw-bold hover:underline">
+                {s.lot?.lotNo || s.lot?.lotNumber || "—"}
+              </Link>
             </td>
             <td>{formatDate(s.date)}</td>
             <td>{s.soldTo || "—"}</td>

@@ -271,7 +271,7 @@ export default function SalesPage() {
                   <td>{s.tax > 0 ? formatINR(s.tax) : "—"}</td>
                   <td className="fw-bold text-success">{formatINR(s.finalBillAmount)}</td>
                   <td>{s.billNo || "—"}</td>
-                  <td><span className="badge" style={{ backgroundColor: getStatusColor(s.lot?.status || "SOLD") }}>{getStatusLabel(s.lot?.status || "SOLD")}</span></td>
+                  <td><span className={`badge border ${getStatusColor(s.lot?.status || "SOLD")}`}>{getStatusLabel(s.lot?.status || "SOLD")}</span></td>
                 </tr>
               ))}
             </tbody>

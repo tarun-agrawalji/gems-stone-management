@@ -28,6 +28,18 @@ export async function createPurchase(
   data: any,
   organizationId: string
 ) {
+  if (!organizationId) {
+    throw new Error("Organization ID is required to create a purchase");
+  }
+
+  // Auto-heal: create the Organization row if it is missing
+  // This handles cases where the DB was re-seeded but the User row still has the old ID
+  await (prisma as any).organization.upsert({
+    where: { id: organizationId },
+    update: {},
+    create: { id: organizationId, name: "Default Organization" },
+  });
+
   return prisma.$transaction(async (tx) => {
     // 1. Find or Create Product
     let product = await (tx as any).product.findFirst({
@@ -138,7 +150,7 @@ export async function updatePurchase(
   organizationId: string
 ) {
   return prisma.$transaction(async (tx) => {
-    const purchase = await tx.purchase.findFirst({
+    const purchase = await (tx as any).purchase.findFirst({
       where: { id, organizationId },
       include: { lot: true },
     });
@@ -171,7 +183,7 @@ export async function updatePurchase(
     const updatedPurchase = await (tx as any).purchase.update({
       where: { id },
       data: {
-        supplier: data.supplierName || data.supplier,
+        supplier: data.supplierName || data.supplier || "",
         itemName: data.itemName,
         descriptionRef: data.descriptionRef,
         date: data.date ? new Date(data.date) : new Date(),

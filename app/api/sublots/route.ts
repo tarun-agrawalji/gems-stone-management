@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
       subLotNo: lot.lotNumber,
       lotId: lot.id,
       lot: { ...lot, lotNo: lot.lotNumber, itemName: lot.product?.name },
-      weight: lot.weight || 0,
+      weight: lot.netWeight || 0,
       weightUnit: "G",
       pieces: lot.quantity,
       status: "IN_STOCK",
@@ -47,8 +47,8 @@ export async function GET(req: NextRequest) {
         if (!purchasesByLotId[p.lotId]) {
           purchasesByLotId[p.lotId] = {
             ...p,
-            netWeight: p.quantity,
-            pieces: p.quantity
+            netWeight: p.netWeight,
+            pieces: p.pieces
           };
         }
       }

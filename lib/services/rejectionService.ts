@@ -1,53 +1,79 @@
 import { prisma } from "@/lib/prisma";
 
 export async function getRejections(organizationId: string, search?: string) {
-  const where: any = { organizationId };
-  
-  // 1. Fetch Purchase Rejections
-  const purchaseWhere: any = { 
-    organizationId,
-    rejectionWeight: { gt: 0 }
-  };
-  if (search) {
-    purchaseWhere.OR = [
-      { supplier: { contains: search, mode: "insensitive" } },
-      { lot: { lotNumber: { contains: search, mode: "insensitive" } } },
-      { itemName: { contains: search, mode: "insensitive" } },
-    ];
+  // 1. Fetch Purchase Rejections - only those that have rejection data
+  let purchases: any[] = [];
+  try {
+    const purchaseWhere: any = {
+      organizationId,
+      rejectionWeight: { not: null },
+    };
+    if (search) {
+      purchaseWhere.AND = [
+        { rejectionWeight: { not: null } },
+        {
+          OR: [
+            { supplier: { contains: search, mode: "insensitive" } },
+            { lot: { lotNumber: { contains: search, mode: "insensitive" } } },
+            { itemName: { contains: search, mode: "insensitive" } },
+          ],
+        },
+      ];
+      delete purchaseWhere.rejectionWeight;
+    }
+    purchases = await (prisma as any).purchase.findMany({
+      where: purchaseWhere,
+      include: { lot: true },
+      orderBy: { date: "desc" },
+    });
+  } catch (e: any) {
+    console.error("[getRejections] purchases query failed:", e?.message);
   }
-  const purchases = await prisma.purchase.findMany({
-    where: purchaseWhere,
-    include: { lot: true },
-    orderBy: { date: "desc" },
-  });
 
-  // 2. Fetch Generic/Manufacturing Rejections
-  const rejectionWhere: any = { organizationId };
-  if (search) {
-    rejectionWhere.OR = [
-      { lot: { lotNumber: { contains: search, mode: "insensitive" } } },
-      { reason: { contains: search, mode: "insensitive" } },
-    ];
+  // 2. Fetch Generic/Manufacturing Rejections (from Rejection table)
+  let genericRejections: any[] = [];
+  try {
+    const rejectionWhere: any = { organizationId };
+    if (search) {
+      rejectionWhere.OR = [
+        { lot: { lotNumber: { contains: search, mode: "insensitive" } } },
+        { reason: { contains: search, mode: "insensitive" } },
+      ];
+    }
+    genericRejections = await prisma.rejection.findMany({
+      where: rejectionWhere,
+      include: { lot: { include: { product: true } } },
+      orderBy: { date: "desc" },
+    });
+  } catch (e: any) {
+    console.error("[getRejections] rejection query failed:", e?.message);
   }
-  const genericRejections = await prisma.rejection.findMany({
-    where: rejectionWhere,
-    include: { lot: { include: { product: true } } },
-    orderBy: { date: "desc" },
-  });
 
   // 3. Fetch Sales Returns
-  const salesWhere: any = { organizationId, isReturn: true };
-  if (search) {
-    salesWhere.OR = [
-      { customer: { contains: search, mode: "insensitive" } },
-      { lot: { lotNumber: { contains: search, mode: "insensitive" } } },
-    ];
+  let salesReturns: any[] = [];
+  try {
+    const salesWhere: any = { organizationId, isReturn: true };
+    if (search) {
+      salesWhere.AND = [
+        { isReturn: true },
+        {
+          OR: [
+            { customer: { contains: search, mode: "insensitive" } },
+            { lot: { lotNumber: { contains: search, mode: "insensitive" } } },
+          ],
+        },
+      ];
+      delete salesWhere.isReturn;
+    }
+    salesReturns = await prisma.sales.findMany({
+      where: salesWhere,
+      include: { lot: true },
+      orderBy: { date: "desc" },
+    });
+  } catch (e: any) {
+    console.error("[getRejections] sales query failed:", e?.message);
   }
-  const salesReturns = await prisma.sales.findMany({
-    where: salesWhere,
-    include: { lot: true },
-    orderBy: { date: "desc" },
-  });
+
 
   // Map Purchase rejections to frontend format
   const mappedPurchases = purchases.map(p => ({
@@ -61,7 +87,7 @@ export async function getRejections(organizationId: string, search?: string) {
     rejectionDate: p.rejectionDate,
     rejectionStatus: p.rejectionStatus,
     weightUnit: p.weightUnit,
-    lot: { lotNo: p.lot?.lotNumber }
+    lot: { lotNo: p.lot?.lotNumber, lotNumber: p.lot?.lotNumber }
   }));
 
   // Map Generic rejections to frontend format (Manufacturing)
@@ -172,7 +198,7 @@ export async function getRejectionById(type: string, id: string, organizationId:
       returnedLines: s.returnedLines,
       returnDate: s.returnDate,
       netSale: s.netSale,
-      status: s.status || "PENDING",
+      status: (s as any).status || "PENDING",
       weightUnit: s.weightUnit,
       lotNo: s.lot?.lotNumber,
       memo: s.descriptionRef,
@@ -185,19 +211,19 @@ export async function getRejectionById(type: string, id: string, organizationId:
 export async function updateRejectionStatus(type: string, id: string, status: string, organizationId: string) {
   if (type === "purchase") {
     return prisma.purchase.update({
-      where: { id, organizationId },
+      where: { id },
       data: { rejectionStatus: status },
     });
   }
   if (type === "manufacturing") {
     return prisma.rejection.update({
-      where: { id, organizationId },
+      where: { id },
       data: { status },
     });
   }
   if (type === "sales") {
     return prisma.sales.update({
-      where: { id, organizationId },
+      where: { id },
       data: { status },
     });
   }

@@ -1,4 +1,4 @@
-// File: C:\Users\Dell\Desktop\dhandewala\gems-stone-and-jewelers-database-management-system-\app\api\auth\[...nextauth]\route.ts
+// File: C:\Users\Dell\Desktop\gems-stone-management\app\api\auth\[...nextauth]\route.ts
 import * as entry from '../../../../../../app/api/auth/[...nextauth]/route.js'
 import type { NextRequest } from 'next/server.js'
 

@@ -5,75 +5,118 @@ import { getTenantContext } from "@/lib/auth/getContext";
 
 export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const search = searchParams.get("search") || "";
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "30");
-
     const { organizationId } = await getTenantContext();
 
-    const where: any = { organizationId };
+    const { searchParams } = new URL(req.url);
+    const search = searchParams.get("search") || "";
+    const category = searchParams.get("category") || "";
+    const status = searchParams.get("status") || "";
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "50");
+
+    // Build where clause — query Purchase table directly so we always
+    // show what was actually purchased.
+    const purchaseWhere: any = { organizationId };
 
     if (search) {
-      where.OR = [
-        { lotNumber: { contains: search } },
-        { product: { name: { contains: search } } },
-        { product: { category: { contains: search } } },
+      purchaseWhere.OR = [
+        { lot: { lotNumber: { contains: search, mode: "insensitive" } } },
+        { itemName: { contains: search, mode: "insensitive" } },
+        { supplier: { contains: search, mode: "insensitive" } },
       ];
     }
 
-    const [lots, total] = await Promise.all([
-      prisma.lot.findMany({
-        where,
-        include: {
-          product: true,
-          manufacturing: {
-            orderBy: { date: "desc" },
-            take: 1,
-          },
-          sales: {
-            orderBy: { date: "desc" },
-            take: 1,
+    // category filter: check the lot's category field
+    if (category) {
+      purchaseWhere.lot = { ...purchaseWhere.lot, category };
+    }
+
+    const purchases = await (prisma as any).purchase.findMany({
+      where: purchaseWhere,
+      include: {
+        lot: {
+          include: {
+            product: true,
+            manufacturing: { orderBy: { date: "desc" }, take: 1 },
+            sales: { orderBy: { date: "desc" }, take: 1 },
           },
         },
-        orderBy: { createdAt: "desc" },
-        skip: (page - 1) * limit,
-        take: limit,
-      }),
-      prisma.lot.count({ where }),
-    ]);
-
-    // Note: To properly calculate statuses, we'd look at remaining quantities
-    // For now, map the lot structure to what the frontend expects as "subLots"
-    const finishedLots = lots.map(lot => ({
-      ...lot,
-      lot: {
-        lotNo: lot.lotNumber,
-        itemName: lot.product?.name,
-        category: lot.product?.category
       },
-      subLotNo: lot.lotNumber, // mock
-      status: "READY",
-      weightUnit: "G",
-      pieces: lot.quantity
-    }));
+      orderBy: { date: "desc" },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    const total = await (prisma as any).purchase.count({ where: purchaseWhere });
+
+    // Map Purchase → the shape the frontend (SubLot type) expects
+    const finishedGoods = purchases
+      .filter((p: any) => {
+        // Apply status filter against the lot status
+        if (status) return (p.lot?.status || "IN_STOCK") === status;
+        return true;
+      })
+      .map((p: any) => {
+        const lot = p.lot;
+        const netWt = (p.grossWeight || 0) - (p.lessWeight || 0);
+        const rejWt = p.rejectionWeight || 0;
+        // Selection weight = net - rejection
+        const selectionWeight = Math.max(0, netWt - rejWt);
+
+        return {
+          id: p.id,
+          subLotNo: lot?.lotNumber || "—",
+          lotId: lot?.id || "",
+          status: lot?.status || "IN_STOCK",
+          weight: selectionWeight,        // show Selection weight as "available" weight
+          weightUnit: p.weightUnit || "G",
+          pieces: p.rejectionPieces != null && p.pieces != null
+            ? Math.max(0, p.pieces - p.rejectionPieces)
+            : (p.pieces ?? null),
+          shape: p.shape,
+          size: p.size,
+          lines: p.lines,
+          length: p.lineLength,
+          updatedAt: p.date,
+          lot: {
+            lotNumber: lot?.lotNumber || "—",
+            itemName: p.itemName || lot?.itemName || lot?.product?.name || null,
+            category: lot?.category || lot?.product?.category || "",
+            supplierName: p.supplier || lot?.supplierName || null,
+            grossWeight: p.grossWeight ?? 0,
+            netWeight: netWt,
+          },
+          manufacturing: lot?.manufacturing || [],
+          sales: lot?.sales || [],
+          // Extra purchase context
+          purchasePrice: p.purchasePrice,
+          totalCost: p.totalCost,
+          purchaseDate: p.date,
+          rejectionWeight: p.rejectionWeight,
+          rejectionPieces: p.rejectionPieces,
+          rejectionStatus: p.rejectionStatus,
+        };
+      });
 
     return NextResponse.json({
-      subLots: finishedLots,
+      subLots: finishedGoods,
       total,
       page,
       limit,
       summary: {
-        readyCount: total,
-        partiallySoldCount: 0,
-        inStockCount: 0,
-        totalAvailable: total,
-        totalWeight: lots.reduce((acc, lot) => acc + (lot.grossWeight || 0), 0)
+        readyCount: finishedGoods.filter((g: any) => g.status === "READY").length,
+        partiallySoldCount: finishedGoods.filter((g: any) => g.status === "PARTIALLY_SOLD").length,
+        inStockCount: finishedGoods.filter((g: any) => g.status === "IN_STOCK").length,
+        totalAvailable: finishedGoods.length,
+        totalWeight: finishedGoods.reduce((acc: number, g: any) => acc + (g.weight || 0), 0),
       },
     });
-  } catch (e) {
-    console.error(e);
-    return NextResponse.json({ error: "Failed to fetch finished goods" }, { status: 500 });
+  } catch (e: any) {
+    console.error("[finished-goods] ERROR:", e);
+    const errorMessage = e?.message || String(e) || "Internal server error";
+    return NextResponse.json(
+      { error: errorMessage },
+      { status: 500 }
+    );
   }
 }
-

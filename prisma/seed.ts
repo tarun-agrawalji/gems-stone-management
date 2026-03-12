@@ -6,6 +6,16 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🌱 Seeding database...");
 
+  // Create default organization
+  const org = await prisma.organization.upsert({
+    where: { id: "default-org-id" },
+    update: {},
+    create: {
+      id: "default-org-id",
+      name: "Gems Corp",
+    },
+  });
+
   // Create admin user
   const adminPassword = await bcrypt.hash("admin123", 12);
   const admin = await prisma.user.upsert({
@@ -16,6 +26,7 @@ async function main() {
       email: "admin@gems.com",
       password: adminPassword,
       role: "ADMIN",
+      organizationId: org.id,
     },
   });
 
@@ -29,6 +40,7 @@ async function main() {
       email: "staff@gems.com",
       password: staffPassword,
       role: "STAFF",
+      organizationId: org.id,
     },
   });
 

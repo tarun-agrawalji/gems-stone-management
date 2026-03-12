@@ -14,9 +14,11 @@ export async function GET(req: Request) {
     return NextResponse.json(rejections);
   } catch (error: any) {
     console.error("[API Rejection GET]", error);
-    return NextResponse.json({ error: error.message }, { status: 401 });
+    const message = error?.message || String(error) || "Unknown error in rejection API";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
+
 
 export async function POST(req: Request) {
   try {
@@ -28,3 +30,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+export async function PATCH(req: Request) {
+  try {
+    const { organizationId } = await getTenantContext();
+    const { recordType, id, status } = await req.json();
+    const result = await rejectionService.updateRejectionStatus(recordType, id, status, organizationId);
+    return NextResponse.json(result);
+  } catch (error: any) {
+    console.error("[API Rejection PATCH]", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+

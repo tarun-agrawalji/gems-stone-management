@@ -8,6 +8,17 @@ export async function getProducts(organizationId: string) {
 }
 
 export async function createProduct(data: { name: string; category: string; description?: string; }, organizationId: string) {
+  if (!organizationId) {
+    throw new Error("Organization ID is required to create a product");
+  }
+
+  // Auto-heal: ensure organization exists
+  await (prisma as any).organization.upsert({
+    where: { id: organizationId },
+    update: {},
+    create: { id: organizationId, name: "Default Organization" },
+  });
+
   return prisma.product.create({
     data: {
       ...data,

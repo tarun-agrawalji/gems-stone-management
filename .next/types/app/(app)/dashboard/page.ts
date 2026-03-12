@@ -1,4 +1,4 @@
-// File: C:\Users\Dell\Desktop\dhandewala\gems-stone-and-jewelers-database-management-system-\app\(app)\dashboard\page.tsx
+// File: C:\Users\Dell\Desktop\gems-stone-management\app\(app)\dashboard\page.tsx
 import * as entry from '../../../../../app/(app)/dashboard/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

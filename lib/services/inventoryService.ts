@@ -13,6 +13,17 @@ export async function createStockLedgerEntry({
   referenceId: string;
   organizationId: string;
 }) {
+  if (!organizationId) {
+    throw new Error("Organization ID is required to create a stock ledger entry");
+  }
+
+  // Auto-heal: ensure organization exists
+  await (prisma as any).organization.upsert({
+    where: { id: organizationId },
+    update: {},
+    create: { id: organizationId, name: "Default Organization" },
+  });
+
   return prisma.stockLedger.create({
     data: {
       productId,
@@ -35,5 +46,5 @@ export async function getProductStock(productId: string, organizationId: string)
     },
   });
 
-  return ledgers.reduce((total, entry) => total + entry.quantity, 0);
+  return ledgers.reduce((total, entry) => total + (entry.quantity || 0), 0);
 }

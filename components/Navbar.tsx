@@ -28,10 +28,10 @@ export default function Navbar({ userName, userRole }: NavbarProps) {
       style={{ transition: 'all 300ms ease' }}
       suppressHydrationWarning
     >
-      <div className="container-fluid navbar-inner">
+      <div className="container-fluid navbar-inner" suppressHydrationWarning>
 
         {/* Sidebar toggle */}
-        <div className="sidebar-toggle" data-toggle="sidebar" data-active="true" onClick={toggleSidebar}>
+        <div className="sidebar-toggle" data-toggle="sidebar" data-active="true" onClick={toggleSidebar} suppressHydrationWarning>
           <i className="icon">
             <svg width="20px" className="icon-20" viewBox="0 0 24 24">
               <path fill="currentColor" d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z" />
@@ -40,7 +40,7 @@ export default function Navbar({ userName, userRole }: NavbarProps) {
         </div>
 
         {/* Search — always visible */}
-        <div className="input-group search-input" style={{ maxWidth: 260 }}>
+        <div className="input-group search-input" style={{ maxWidth: 260 }} suppressHydrationWarning>
           <span className="input-group-text" id="search-input">
             <svg className="icon-18" width="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="11.7669" cy="11.7666" r="8.98856" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -68,10 +68,10 @@ export default function Navbar({ userName, userRole }: NavbarProps) {
               </svg>
               <span className="bg-danger dots"></span>
             </a>
-            <div className="p-0 sub-drop dropdown-menu dropdown-menu-end" aria-labelledby="notification-drop" style={{ minWidth: 280 }}>
-              <div className="m-0 shadow-none card">
-                <div className="py-3 px-3 card-header d-flex justify-content-between bg-primary">
-                  <div className="header-title">
+            <div className="p-0 sub-drop dropdown-menu dropdown-menu-end" aria-labelledby="notification-drop" style={{ minWidth: 280 }} suppressHydrationWarning>
+              <div className="m-0 shadow-none card" suppressHydrationWarning>
+                <div className="py-3 px-3 card-header d-flex justify-content-between bg-primary" suppressHydrationWarning>
+                  <div className="header-title" suppressHydrationWarning>
                     <h5 className="mb-0 text-white">Notifications</h5>
                   </div>
                 </div>
@@ -80,14 +80,15 @@ export default function Navbar({ userName, userRole }: NavbarProps) {
                     <div
                       className="rounded-pill bg-soft-primary d-flex align-items-center justify-content-center flex-shrink-0"
                       style={{ width: 40, height: 40 }}
+                      suppressHydrationWarning
                     >
                       <svg width="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path opacity="0.4" d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#3b8aff"/>
                       </svg>
                     </div>
-                    <div className="w-100">
+                    <div className="w-100" suppressHydrationWarning>
                       <h6 className="mb-0">System Status</h6>
-                      <div className="d-flex justify-content-between">
+                      <div className="d-flex justify-content-between" suppressHydrationWarning>
                         <p className="mb-0 text-muted small">All systems operational</p>
                         <small className="text-muted">Just now</small>
                       </div>
@@ -110,21 +111,23 @@ export default function Navbar({ userName, userRole }: NavbarProps) {
               <div
                 className="rounded-pill bg-primary d-flex align-items-center justify-content-center"
                 style={{ width: 36, height: 36, fontWeight: 700, color: "#fff", fontSize: 13, flexShrink: 0 }}
+                suppressHydrationWarning
               >
                 {initials}
               </div>
             </a>
-            <div className="p-0 sub-drop dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown" style={{ minWidth: 220 }}>
-              <div className="m-0 shadow-none card">
+            <div className="p-0 sub-drop dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown" style={{ minWidth: 220 }} suppressHydrationWarning>
+              <div className="m-0 shadow-none card" suppressHydrationWarning>
                 {/* Header */}
-                <div className="py-3 px-3 card-header d-flex align-items-center gap-3 bg-primary">
+                <div className="py-3 px-3 card-header d-flex align-items-center gap-3 bg-primary" suppressHydrationWarning>
                   <div
                     className="rounded-pill bg-white d-flex align-items-center justify-content-center flex-shrink-0"
                     style={{ width: 42, height: 42, fontWeight: 700, color: "#3b8aff", fontSize: 15 }}
+                    suppressHydrationWarning
                   >
                     {initials}
                   </div>
-                  <div>
+                  <div suppressHydrationWarning>
                     <h6 className="mb-1 text-white fw-semibold">{userName || "User"}</h6>
                     {userRole && (
                       <span className="badge bg-white text-primary" style={{ fontSize: "0.65rem" }}>
@@ -134,7 +137,7 @@ export default function Navbar({ userName, userRole }: NavbarProps) {
                   </div>
                 </div>
                 {/* Body */}
-                <div className="p-0 card-body">
+                <div className="p-0 card-body" suppressHydrationWarning>
                   <Link href="#" className="iq-sub-card d-flex align-items-center gap-2 px-3 py-2 text-decoration-none text-dark">
                     <svg width="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M11.9488 14.54C8.498 14.54 5.588 15.104 5.588 17.28C5.588 19.456 8.518 20 11.9488 20C15.399 20 18.31 19.436 18.31 17.261C18.31 15.084 15.38 14.54 11.9488 14.54Z" fill="currentColor"/>
@@ -142,7 +145,7 @@ export default function Navbar({ userName, userRole }: NavbarProps) {
                     </svg>
                     My Profile
                   </Link>
-                  <div className="dropdown-divider m-0"></div>
+                  <div className="dropdown-divider m-0" suppressHydrationWarning></div>
                   <button
                     className="iq-sub-card d-flex align-items-center gap-2 w-100 border-0 bg-transparent text-danger px-3 py-2"
                     style={{ cursor: "pointer" }}

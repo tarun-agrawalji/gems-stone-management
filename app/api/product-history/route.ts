@@ -24,10 +24,10 @@ export async function GET(req: NextRequest) {
 
       const lotsWithMetrics = allLots.map(lot => {
         let totalPurchaseCost = 0;
-        lot.purchases.forEach(p => totalPurchaseCost += (p.purchasePrice * p.quantity));
+        lot.purchases.forEach(p => totalPurchaseCost += (p.purchasePrice));
 
         let totalRevenue = 0;
-        lot.sales.forEach(s => totalRevenue += (s.salePrice * s.quantity));
+        lot.sales.forEach(s => totalRevenue += (s.netSale));
 
         let totalManufacturingCost = 0; // Not tracked in new schema directly
 
@@ -73,7 +73,7 @@ export async function GET(req: NextRequest) {
     let initialWeightNet = lot.quantity; // mock
 
     lot.purchases.forEach(p => {
-      totalPurchaseCost += (p.purchasePrice * p.quantity);
+      totalPurchaseCost += (p.purchasePrice);
     });
 
     let totalManufacturingCost = 0;
@@ -82,7 +82,7 @@ export async function GET(req: NextRequest) {
     let currentAvailableWeight = lot.quantity;
 
     lot.sales.forEach(s => {
-      totalRevenue += (s.salePrice * s.quantity);
+      totalRevenue += (s.netSale);
     });
 
     const netProfit = totalRevenue - (totalPurchaseCost + totalManufacturingCost);
@@ -108,10 +108,10 @@ export async function GET(req: NextRequest) {
         id: lot.id,
         subLotNo: lot.lotNumber,
         status: "READY",
-        weight: lot.weight || 0,
+        weight: lot.netWeight || 0,
         pieces: lot.quantity,
         manufacturing: lot.manufacturing.map(m => ({ ...m, totalManufacturingCost: 0 })),
-        sales: lot.sales.map(s => ({ ...s, netSale: s.salePrice * s.quantity, discount: 0 }))
+        sales: lot.sales.map(s => ({ ...s, netSale: s.netSale, discount: 0 }))
       }]
     };
 

@@ -34,6 +34,12 @@ type SubLot = {
   lines: number | null;
   length: number | null;
   updatedAt: string;
+  purchaseDate: string;
+  purchasePrice: number;
+  totalCost: number;
+  rejectionWeight: number | null;
+  rejectionPieces: number | null;
+  rejectionStatus: string | null;
   lot: {
     lotNumber: string;
     itemName: string | null;
@@ -55,14 +61,20 @@ export default function FinishedGoodsPage() {
   const [category, setCategory] = useState("");
   const [status, setStatus] = useState("");
   const [selected, setSelected] = useState<SubLot | null>(null);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
+      setApiError(null);
       const params = new URLSearchParams({ search, category, status });
       const r = await fetch(`/api/finished-goods?${params}`);
       if (!r.ok) {
-        console.error("Failed to fetch finished goods:", r.statusText);
+        const errorData = await r.json().catch(() => ({}));
+        const msg = errorData.error || r.statusText;
+        console.error("Failed to fetch finished goods:", msg);
+        setApiError(msg);
+        setItems([]);
       } else {
         const data = await r.json();
         if (Array.isArray(data)) {
@@ -210,6 +222,12 @@ export default function FinishedGoodsPage() {
         </div>
       </div>
 
+      {apiError && (
+        <div className="alert alert-danger shadow-sm border-0 rounded-4 mb-3">
+          <strong>Database Error:</strong> {apiError}
+        </div>
+      )}
+
       {/* Table */}
       <div className="card flex-fill w-100">
         <div className="table-responsive">
@@ -217,16 +235,15 @@ export default function FinishedGoodsPage() {
             <thead>
               <tr>
                 <th>Lot No</th>
-                <th>Sub Lot</th>
+                <th>Date</th>
                 <th>Item / Category</th>
                 <th>Supplier</th>
-                <th>Weight</th>
+                <th>Selection Weight</th>
                 <th>Pieces</th>
                 <th>Shape</th>
                 <th>Size</th>
-                <th>Lines</th>
+                <th>Purchase Price</th>
                 <th>Status</th>
-                <th>Last Updated</th>
                 <th></th>
               </tr>
             </thead>
@@ -240,24 +257,22 @@ export default function FinishedGoodsPage() {
               ) : items.length === 0 ? (
                 <tr>
                   <td colSpan={12} className="text-center py-5 text-muted">
-                    No finished goods found. Products appear here after manufacturing is completed.
+                    No lots found. Add a purchase to see inventory here.
                   </td>
                 </tr>
               ) : (
-                items.map((item) => (
+                  items.map((item) => (
                   <tr
                     key={item.id}
                     className="cursor-pointer"
                     onClick={() => setSelected(item)}
                   >
                     <td>
-                      <span className="font-monospace text-primary fw-medium">
+                      <a href={`/purchase/${item.id}`} className="font-monospace text-primary fw-bold text-decoration-none">
                         {item.lot?.lotNumber || "N/A"}
-                      </span>
+                      </a>
                     </td>
-                    <td>
-                      <span className="font-monospace small">{item.subLotNo || "—"}</span>
-                    </td>
+                    <td className="text-muted small text-nowrap">{formatDate(item.purchaseDate || item.updatedAt)}</td>
                     <td>
                       <p className="fw-medium small mb-0">{item.lot.itemName || "—"}</p>
                       <p className="small text-muted mb-0">
@@ -272,25 +287,13 @@ export default function FinishedGoodsPage() {
                     <td>{item.pieces ?? "—"}</td>
                     <td>{item.shape || "—"}</td>
                     <td>{item.size || "—"}</td>
-                    <td>
-                      {item.lines != null ? (
-                        <span>
-                          {item.lines}
-                          {item.length != null && (
-                            <span className="small text-muted ms-1">
-                              × {item.length}
-                            </span>
-                          )}
-                        </span>
-                      ) : "—"}
+                    <td className="fw-semibold text-amber-600">
+                      {item.purchasePrice != null ? `₹${item.purchasePrice.toLocaleString("en-IN")}` : "—"}
                     </td>
                     <td>
                       <span className={`badge ${getStatusColor(item.status)}`}>
                         {getStatusLabel(item.status)}
                       </span>
-                    </td>
-                    <td className="text-muted small text-nowrap">
-                      {formatDate(item.updatedAt)}
                     </td>
                     <td>
                       <button
@@ -320,7 +323,7 @@ export default function FinishedGoodsPage() {
                 <div>
                   <h5 className="modal-title fw-bold d-flex align-items-center gap-2 m-0">
                     <Gem className="w-5 h-5 text-primary" />
-                    {selected!.lot?.lotNumber || "N/A"} — {selected!.subLotNo || "—"}
+                    {selected!.lot?.lotNumber || "N/A"}
                   </h5>
                   <p className="small text-muted mb-0 mt-1">
                     {selected!.lot?.itemName || "—"} · {getCategoryLabel(selected!.lot?.category || "")}
@@ -333,7 +336,7 @@ export default function FinishedGoodsPage() {
               <div className="modal-body p-4 space-y-4">
                 {/* Status */}
                 <div className="d-flex align-items-center gap-2 mb-4">
-                  <span className="small text-muted">Status:</span>
+                  <span className="small text-muted">Lot Status:</span>
                   <span className={`badge ${getStatusColor(selected!.status)}`}>
                     {getStatusLabel(selected!.status)}
                   </span>
@@ -341,11 +344,9 @@ export default function FinishedGoodsPage() {
 
                 {/* Physical Details */}
                 <div className="mb-4">
-                  <p className="small fw-bold text-muted text-uppercase mb-2">
-                    Physical Details
-                  </p>
+                  <p className="small fw-bold text-muted text-uppercase mb-2">Physical Details</p>
                   <div className="row g-3">
-                    <div className="col-4"><DetailField label="Weight" value={`${selected!.weight != null ? selected!.weight.toFixed(3) : "—"} ${selected!.weightUnit}`} /></div>
+                    <div className="col-4"><DetailField label="Selection Weight" value={`${selected!.weight != null ? selected!.weight.toFixed(3) : "—"} ${selected!.weightUnit}`} /></div>
                     <div className="col-4"><DetailField label="Pieces" value={selected!.pieces ?? "—"} /></div>
                     <div className="col-4"><DetailField label="Shape" value={selected!.shape ?? "—"} /></div>
                     <div className="col-4"><DetailField label="Size" value={selected!.size ?? "—"} /></div>
@@ -354,35 +355,42 @@ export default function FinishedGoodsPage() {
                   </div>
                 </div>
 
-                {/* Supplier */}
+                {/* Financials */}
                 <div className="mb-4">
-                  <p className="small fw-bold text-muted text-uppercase mb-2">
-                    Source
-                  </p>
+                  <p className="small fw-bold text-muted text-uppercase mb-2">Financials</p>
                   <div className="row g-3">
-                    <div className="col-6"><DetailField label="Supplier" value={selected!.lot?.supplierName ?? "—"} /></div>
-                    <div className="col-6"><DetailField label="Last Updated" value={formatDate(selected!.updatedAt)} /></div>
+                    <div className="col-6"><DetailField label="Purchase Price" value={selected!.purchasePrice != null ? `₹${selected!.purchasePrice.toLocaleString("en-IN")}` : "—"} /></div>
+                    <div className="col-6"><DetailField label="Total Cost" value={selected!.totalCost != null ? `₹${selected!.totalCost.toLocaleString("en-IN")}` : "—"} /></div>
                   </div>
                 </div>
 
-                {/* Manufacturing Cost */}
-                {selected!.manufacturing.length > 0 && (
-                  <div>
-                    <p className="small fw-bold text-muted text-uppercase mb-2">
-                      Manufacturing
-                    </p>
-                    <DetailField
-                      label="Total Mfg Cost"
-                      value={`₹${selected!.manufacturing[0].totalManufacturingCost.toLocaleString("en-IN")}`}
-                    />
+                {/* Rejection */}
+                {(selected!.rejectionWeight != null || selected!.rejectionPieces != null) && (
+                  <div className="mb-4">
+                    <p className="small fw-bold text-muted text-uppercase mb-2">Rejection Info</p>
+                    <div className="row g-3">
+                      <div className="col-4"><DetailField label="Rej. Weight" value={selected!.rejectionWeight != null ? `${selected!.rejectionWeight} ${selected!.weightUnit}` : "—"} /></div>
+                      <div className="col-4"><DetailField label="Rej. Pieces" value={selected!.rejectionPieces ?? "—"} /></div>
+                      <div className="col-4"><DetailField label="Rej. Status" value={selected!.rejectionStatus || "PENDING"} /></div>
+                    </div>
                   </div>
                 )}
+
+                {/* Supplier */}
+                <div className="mb-4">
+                  <p className="small fw-bold text-muted text-uppercase mb-2">Source</p>
+                  <div className="row g-3">
+                    <div className="col-6"><DetailField label="Supplier" value={selected!.lot?.supplierName ?? "—"} /></div>
+                    <div className="col-6"><DetailField label="Purchase Date" value={formatDate(selected!.purchaseDate || selected!.updatedAt)} /></div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
         </ModalPortal>
       )}
+
     </div>
   );
 }
