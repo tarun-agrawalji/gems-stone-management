@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node node_modules/prisma/build/index.js generate && next build",
+    "build": "node node_modules/prisma/build/index.js generate && node node_modules/next/dist/bin/next build",
     "start": "next start",
     "lint": "next lint",
     "db:generate": "prisma generate",
