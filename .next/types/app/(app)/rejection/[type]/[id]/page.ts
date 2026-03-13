@@ -1,4 +1,4 @@
-// File: C:\Users\Dell\Desktop\gems-stone-management\app\(app)\rejection\[type]\[id]\page.tsx
+// File: c:\Users\Dell\Desktop\gems-stone-management\app\(app)\rejection\[type]\[id]\page.tsx
 import * as entry from '../../../../../../../app/(app)/rejection/[type]/[id]/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

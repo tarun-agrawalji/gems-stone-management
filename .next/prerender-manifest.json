@@ -1,30 +1,6 @@
 {
   "version": 4,
   "routes": {
-    "/register": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "Next-Action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/register",
-      "dataRoute": "/register.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
     "/login": {
       "experimentalBypassFor": [
         {
@@ -48,13 +24,37 @@
         "x-next-revalidated-tags",
         "x-next-revalidate-tag-token"
       ]
+    },
+    "/register": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "Next-Action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/register",
+      "dataRoute": "/register.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
     }
   },
   "dynamicRoutes": {},
   "notFoundRoutes": [],
   "preview": {
-    "previewModeId": "774e3ae5ed7ea9da50b12348489c536b",
-    "previewModeSigningKey": "d632358209960ae136ce3ce29c010ffd5a322a26946d960441af3e84c09a9390",
-    "previewModeEncryptionKey": "5795f359d2493ec0b28962d92ada816785ffda5865fcd35598fe44a302af0b19"
+    "previewModeId": "d3854b4e885741375c45edd229b48041",
+    "previewModeSigningKey": "b3d48d1133104586248dc32d7f72dfae69dc260692c529898c01cf92b39450e7",
+    "previewModeEncryptionKey": "6b0c4e320c743920e4a0fc8fb656c04b5a79df07efaa8ad1668f6c4b93298cb9"
   }
 }

@@ -1,4 +1,4 @@
-// File: C:\Users\Dell\Desktop\gems-stone-management\app\api\rejection-item\[type]\[id]\route.ts
+// File: c:\Users\Dell\Desktop\gems-stone-management\app\api\rejection-item\[type]\[id]\route.ts
 import * as entry from '../../../../../../../app/api/rejection-item/[type]/[id]/route.js'
 import type { NextRequest } from 'next/server.js'
 

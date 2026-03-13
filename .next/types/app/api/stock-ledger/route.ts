@@ -1,4 +1,4 @@
-// File: C:\Users\Dell\Desktop\gems-stone-management\app\api\stock-ledger\route.ts
+// File: c:\Users\Dell\Desktop\gems-stone-management\app\api\stock-ledger\route.ts
 import * as entry from '../../../../../app/api/stock-ledger/route.js'
 import type { NextRequest } from 'next/server.js'
 

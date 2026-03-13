@@ -1,4 +1,4 @@
-// File: C:\Users\Dell\Desktop\gems-stone-management\app\api\dashboard\route.ts
+// File: c:\Users\Dell\Desktop\gems-stone-management\app\api\dashboard\route.ts
 import * as entry from '../../../../../app/api/dashboard/route.js'
 import type { NextRequest } from 'next/server.js'
 

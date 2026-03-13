@@ -96,7 +96,7 @@
         "transform": "lodash/{{member}}"
       }
     },
-    "outputFileTracingRoot": "C:\\Users\\Dell\\Desktop\\gems-stone-management",
+    "outputFileTracingRoot": "c:\\Users\\Dell\\Desktop\\gems-stone-management",
     "experimental": {
       "nodeMiddleware": false,
       "cacheLife": {
@@ -174,7 +174,7 @@
       "forceSwcTransforms": false,
       "largePageDataBytes": 128000,
       "turbo": {
-        "root": "C:\\Users\\Dell\\Desktop\\gems-stone-management"
+        "root": "c:\\Users\\Dell\\Desktop\\gems-stone-management"
       },
       "typedRoutes": false,
       "typedEnv": false,
@@ -285,7 +285,7 @@
     "bundlePagesRouterDependencies": false,
     "configFileName": "next.config.ts"
   },
-  "appDir": "C:\\Users\\Dell\\Desktop\\gems-stone-management",
+  "appDir": "c:\\Users\\Dell\\Desktop\\gems-stone-management",
   "relativeAppDir": "",
   "files": [
     ".next\\routes-manifest.json",
